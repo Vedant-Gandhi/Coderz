@@ -1,0 +1,9 @@
+.App
+{}
+.CodeMirror
+{
+    height: 100% !important;
+    width: 100% !important;
+
+    font-size: 18px;
+}
