@@ -18,6 +18,12 @@ const CodeWindowMenuBar: React.FC<CodeWindowMenuBarProps> = ({
   const [selectedTab, updateSelectedTab] = React.useState(
     null as unknown | string
   );
+  React.useEffect(()=>{
+    if(tabs.length > 0)
+    {
+      updateSelectedTab(tabs[0].key)
+    }
+  },[tabs])
   return (
     <nav className="bg-gray-700 lg:px-4 lg:py-2 lg:flex lg:items-center border border-gray-700">
       <div className="w-1/2 overflow-x-auto overflow-y-hidden  h-full flex items-center">

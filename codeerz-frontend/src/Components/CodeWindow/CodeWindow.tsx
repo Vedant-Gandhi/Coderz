@@ -18,7 +18,9 @@ require("codemirror/mode/javascript/javascript");
 require("codemirror/mode/xml/xml");
 
 //Hint
+require("codemirror/addon/hint/show-hint");
 require("codemirror/addon/hint/html-hint");
+require("codemirror/addon/hint/javascript-hint");
 
 //Linting and closed brackets
 
@@ -29,13 +31,13 @@ interface CodeWindowProps {
   onChange?: Function;
   disableMenuBar?: boolean;
 }
-
+var tabData: any = {};
 const CodeWindow: React.FC<CodeWindowProps> = ({
   onChange,
   disableMenuBar = false,
 }) => {
   //Stores the code from current tabs
-  const tabData: any = {};
+  
 
   //Store the codemirror editor once it mounts
   const [codeMirrorEditor, updatecodeMirrorEditor] = React.useState(
@@ -56,6 +58,7 @@ const CodeWindow: React.FC<CodeWindowProps> = ({
   //When the selected tab changes it updates the current code value in our tab code storage
   React.useEffect(() => {
     if (selectedTab && codeMirrorEditor) {
+      console.log(tabData)
       codeMirrorEditor.setValue(tabData[selectedTab.key] || "");
     }
   }, [codeMirrorEditor, selectedTab]);
@@ -66,6 +69,15 @@ const CodeWindow: React.FC<CodeWindowProps> = ({
       updateTabs((() => Object.values(defaultTabs).map((value) => value))());
     }
   }, [isDirectory]);
+
+  React.useEffect(()=>{
+   if(tabs.length > 0)
+   {
+    updateselectedTab(tabs[0])
+   }
+  },[tabs])
+
+ 
 
   return (
     <section

@@ -13,57 +13,67 @@ const BrowserWindow: React.FC<BrowserWindowProps> = ({
   cssCode,
   jsCode,
 }) => {
-  const [refreshCounter, updaterefreshCounter] = React.useState(0);
-  const [iframeRef, updateIframeRef] = React.useState(
-    null as unknown as HTMLIFrameElement | null
-  );
-  React.useEffect(() => {
-    if(!htmlCode)
-    {
-      let newDom = generateNewDOM(htmlCode, cssCode || " ", jsCode || " ");
-      if (iframeRef) {
-        iframeRef!.contentDocument!.documentElement!.innerHTML =
-          newDom.documentElement.innerHTML;
-      }
+  const iframeRef = React.useRef<HTMLIFrameElement>(null);
+  const onIframeLoad = () => {
+    if (iframeRef.current !== null) {
+      let newDom = generateNewDOM(
+        htmlCode || "",
+        cssCode || " ",
+        jsCode || " "
+      );
+
+      iframeRef!.current!.contentDocument!.documentElement!.innerHTML =
+        newDom.documentElement.innerHTML;
     }
+  };
+  React.useEffect(() => {
+    onIframeLoad();
   }, [iframeRef]);
+
   React.useEffect(() => {
     let newDom = generateNewDOM(htmlCode, cssCode || " ", jsCode || " ");
-    if (iframeRef) {
-      iframeRef!.contentDocument!.documentElement!.innerHTML =
+    if (iframeRef.current !== null) {
+      iframeRef!.current!.contentDocument!.documentElement!.innerHTML =
         newDom.documentElement.innerHTML;
     }
   }, [htmlCode]);
 
   React.useEffect(() => {
-
-    if (iframeRef) {
-      iframeRef!.contentDocument!.getElementById("customcss")!.innerHTML =
-        cssCode || "";
+    if (iframeRef !== null) {
+      iframeRef!.current!.contentDocument!.getElementById(
+        "customcss"
+      )!.innerHTML = cssCode || "";
     }
   }, [cssCode]);
 
   React.useEffect(() => {
-    if (iframeRef) {
-      iframeRef!.contentDocument!.getElementById("customjs")!.innerHTML =
-        jsCode || "";
+    if (iframeRef.current !== null) {
+      let newScript =
+        iframeRef!.current!.contentDocument!.createElement("script");
+      newScript.text = jsCode || "";
+
+      let currentScript =
+        iframeRef!.current!.contentDocument!.getElementById("customjs");
+
+      if (currentScript != null) {
+        iframeRef!.current!.contentDocument!.body.removeChild(currentScript);
+      } else iframeRef!.current!.contentDocument!.body.appendChild(newScript);
     }
   }, [jsCode]);
-
   return (
     <section className="h-screen grid grid-rows-[auto_1fr] ">
       <BrowserMenuBar
         onRefresh={() => {
-          updaterefreshCounter(refreshCounter + 1);
+          if (iframeRef.current !== null) {
+            iframeRef.current.contentWindow?.location.reload();
+          }
         }}
       ></BrowserMenuBar>
       <iframe
-        ref={(data) => {
-          updateIframeRef(data);
-        }}
-        key={refreshCounter}
+        ref={iframeRef}
         title="Reload Window"
         className="border-0 w-full h-full overflow-auto box-border"
+        onLoad={onIframeLoad}
       ></iframe>
     </section>
   );
@@ -86,7 +96,7 @@ const generateNewDOM = (
     let scriptNode = parser.createElement("script");
     scriptNode.innerHTML = jsCode;
     scriptNode.id = "customjs";
-    parser.head.appendChild(scriptNode);
+    parser.body.appendChild(scriptNode);
   }
   return parser;
 };
