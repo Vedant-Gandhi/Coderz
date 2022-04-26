@@ -12,6 +12,7 @@ import "codemirror/addon/edit/closetag";
 import html5icon from "../../assets/icons/html5.png";
 import css3icon from "../../assets/icons/css3.png";
 import jsIcon from "../../assets/icons/js.png";
+import FilePane from "./FilePane";
 
 require("codemirror/mode/htmlmixed/htmlmixed");
 require("codemirror/mode/javascript/javascript");
@@ -36,8 +37,8 @@ const CodeWindow: React.FC<CodeWindowProps> = ({
   onChange,
   disableMenuBar = false,
 }) => {
-  //Stores the code from current tabs
-  
+  //Stores the state of file Pane
+  const [isPaneOpen, updatePaneOpen] = React.useState(false);
 
   //Store the codemirror editor once it mounts
   const [codeMirrorEditor, updatecodeMirrorEditor] = React.useState(
@@ -58,7 +59,6 @@ const CodeWindow: React.FC<CodeWindowProps> = ({
   //When the selected tab changes it updates the current code value in our tab code storage
   React.useEffect(() => {
     if (selectedTab && codeMirrorEditor) {
-      console.log(tabData)
       codeMirrorEditor.setValue(tabData[selectedTab.key] || "");
     }
   }, [codeMirrorEditor, selectedTab]);
@@ -70,58 +70,68 @@ const CodeWindow: React.FC<CodeWindowProps> = ({
     }
   }, [isDirectory]);
 
-  React.useEffect(()=>{
-   if(tabs.length > 0)
-   {
-    updateselectedTab(tabs[0])
-   }
-  },[tabs])
+  React.useEffect(() => {
+    if (tabs.length > 0) {
+      updateselectedTab(tabs[0]);
+    }
+  }, [tabs]);
 
- 
+  const openFilePane = () => {
+    updatePaneOpen(true);
+  };
+  const closeFilePane = () => {
+    updatePaneOpen(false);
+  };
 
   return (
-    <section
-      className={`h-screen ${!disableMenuBar && " grid grid-rows-[auto_1fr]"}`}
-    >
-      {!disableMenuBar && (
-        <CodeWindowMenuBar
-          tabs={tabs}
-          onTabClick={(tab_: LanguageTab) => {
-            if (selectedTab) {
-              tabData[selectedTab.key] = codeMirrorEditor?.getValue() || "";
-            }
-            updateselectedTab(tab_ || null);
-          }}
-        ></CodeWindowMenuBar>
-      )}
-      <div className="bg-gray-800 border-0 w-full h-full overflow-x-auto box-border grid ">
-        <CodeMirror
-          editorDidMount={(codeEditor) => {
-            updatecodeMirrorEditor(codeEditor);
-          }}
-          className="w-full h-full font-medium "
-          value={tabData?.[selectedTab?.key || ""] || ""}
-          options={{
-            mode: selectedTab?.config.mode,
-            name: selectedTab?.config.name,
-            theme: "material",
-            lineWrapping: true,
-            smartIndent: true,
-            lineNumbers: true,
-            foldGutter: true,
-            autoCloseTags: true,
-            autoCloseBrackets: true,
-            autoRefresh: true,
-            extraKeys: { "Ctrl-Space": "autocomplete" },
-          }}
-          onChange={(editor, data, value) => {
-            if (typeof onChange == "function") {
-              onChange(value, selectedTab?.config);
-            }
-          }}
-        ></CodeMirror>
-      </div>
-    </section>
+    <>
+      <FilePane show={isPaneOpen} onClose={closeFilePane}></FilePane>
+      <section
+        className={`h-screen ${
+          !disableMenuBar && " grid grid-rows-[auto_1fr]"
+        }`}
+      >
+        {!disableMenuBar && (
+          <CodeWindowMenuBar
+            tabs={tabs}
+            onTabClick={(tab_: LanguageTab) => {
+              if (selectedTab) {
+                tabData[selectedTab.key] = codeMirrorEditor?.getValue() || "";
+              }
+              updateselectedTab(tab_ || null);
+            }}
+            onMenuClick={openFilePane}
+          ></CodeWindowMenuBar>
+        )}
+        <div className="bg-gray-800 border-0 w-full h-full overflow-x-auto box-border grid ">
+          <CodeMirror
+            editorDidMount={(codeEditor) => {
+              updatecodeMirrorEditor(codeEditor);
+            }}
+            className="w-full h-full font-medium "
+            value={tabData?.[selectedTab?.key || ""] || ""}
+            options={{
+              mode: selectedTab?.config.mode,
+              name: selectedTab?.config.name,
+              theme: "material",
+              lineWrapping: true,
+              smartIndent: true,
+              lineNumbers: true,
+              foldGutter: true,
+              autoCloseTags: true,
+              autoCloseBrackets: true,
+              autoRefresh: true,
+              extraKeys: { "Ctrl-Space": "autocomplete" },
+            }}
+            onChange={(editor, data, value) => {
+              if (typeof onChange == "function") {
+                onChange(value, selectedTab?.config);
+              }
+            }}
+          ></CodeMirror>
+        </div>
+      </section>
+    </>
   );
 };
 export default CodeWindow;

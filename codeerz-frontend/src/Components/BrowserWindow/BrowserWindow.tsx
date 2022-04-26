@@ -51,13 +51,15 @@ const BrowserWindow: React.FC<BrowserWindowProps> = ({
       let newScript =
         iframeRef!.current!.contentDocument!.createElement("script");
       newScript.text = jsCode || "";
+      newScript.id="customjs"
 
       let currentScript =
         iframeRef!.current!.contentDocument!.getElementById("customjs");
 
       if (currentScript != null) {
-        iframeRef!.current!.contentDocument!.body.removeChild(currentScript);
-      } else iframeRef!.current!.contentDocument!.body.appendChild(newScript);
+        iframeRef!.current!.contentDocument!.body!.removeChild(currentScript);
+      } 
+       iframeRef!.current!.contentDocument!.body!.appendChild(newScript);
     }
   }, [jsCode]);
   return (

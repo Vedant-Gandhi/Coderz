@@ -14,17 +14,17 @@ const EditorPage: React.FC<any> = () => {
   const [jsCode, updatejsCode] = React.useState("");
 
   const cssDebounced = React.useCallback(
-    debounce((value) => updatecssCode(value), 300),
+    debounce((value) => updatecssCode(value), 500),
     []
   );
 
   const htmlDebounced = React.useCallback(
-    debounce((value) => updateHTMLCode(value), 300),
+    debounce((value) => updateHTMLCode(value), 500),
     []
   );
 
   const jsDebounced = React.useCallback(
-    debounce((value) => updatejsCode(value), 300),
+    debounce((value) => updatejsCode(value), 1000),
     []
   );
   const onCodeChange = (code: string, value?: languageConfig) => {
