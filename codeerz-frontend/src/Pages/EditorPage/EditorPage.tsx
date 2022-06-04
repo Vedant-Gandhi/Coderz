@@ -1,10 +1,10 @@
 import * as React from "react";
-import BrowserWindow from "../Components/BrowserWindow/BrowserWindow";
-import CodeWindow from "../Components/CodeWindow/CodeWindow";
+import BrowserWindow from "../../Components/BrowserWindow/BrowserWindow";
+import CodeWindow from "../../Components/CodeWindow/CodeWindow";
 import {
   codeEditorLanguages,
   languageConfig,
-} from "../Components/CodeWindow/CodeWindowConfig";
+} from "../../Components/CodeWindow/CodeWindowConfig";
 
 import debounce from "lodash.debounce";
 
@@ -44,7 +44,7 @@ const EditorPage: React.FC<any> = () => {
   return (
     <section className="grid grid-cols-[68%_32%]">
       <div>
-        <CodeWindow onChange={onCodeChange}></CodeWindow>
+        <CodeWindow onChange={onCodeChange} filepane></CodeWindow>
       </div>
       <div>
         <BrowserWindow
